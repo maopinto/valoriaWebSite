@@ -196,29 +196,55 @@
   const dialog = document.querySelector('.project-dialog');
   const iframe = dialog.querySelector('iframe');
   const stage = dialog.querySelector('.preview-stage');
+  const frame = dialog.querySelector('.preview-frame');
+  const frameBar = dialog.querySelector('.frame-bar');
+  const frameUrl = dialog.querySelector('.frame-url');
+  const openLink = dialog.querySelector('.dialog-open');
+  const dialogIndex = dialog.querySelector('.dialog-index');
   const projects = {
-    architecture: { title: 'מרחב — אדריכלות עם מחשבה', src: 'concepts/architecture.html' },
-    objects: { title: 'אובייקט — פחות, אבל מדויק', src: 'concepts/objects.html' }
+    architecture: { title: 'מרחב — אדריכלות עם מחשבה', src: 'concepts/architecture.html', index: '01' },
+    objects: { title: 'אובייקט — פחות, אבל מדויק', src: 'concepts/objects.html', index: '02' }
   };
+  // Desktop: a browser window that scales a 1024px+ page down to fit.
+  // Mobile: a phone body around a 375px-wide page.
   function sizePreview() {
     if (!dialog.open) return;
     const spacing = getComputedStyle(stage);
     const availableWidth = stage.clientWidth - parseFloat(spacing.paddingLeft) - parseFloat(spacing.paddingRight);
     const availableHeight = stage.clientHeight - parseFloat(spacing.paddingTop) - parseFloat(spacing.paddingBottom);
-    const width = stage.classList.contains('is-mobile') ? Math.min(375, availableWidth) : Math.max(1024, availableWidth);
-    const scale = Math.min(1, availableWidth / width);
-    iframe.style.width = `${width}px`;
-    iframe.style.height = `${availableHeight / scale}px`;
+    const mobile = stage.classList.contains('is-mobile');
+    const bezel = mobile ? (availableWidth < 420 ? 8 : 12) : 0;
+    const bar = mobile ? (availableWidth < 420 ? 26 : 34) : frameBar.offsetHeight; // phone status bar / browser bar
+    const pageWidth = mobile ? 375 : Math.max(1024, availableWidth);
+    const scale = Math.min(1, (availableWidth - bezel * 2) / pageWidth);
+    const frameHeight = mobile ? Math.min(availableHeight, 812 * scale + bezel * 2 + bar) : availableHeight;
+    frame.style.setProperty('--bezel', `${bezel}px`);
+    frame.style.width = `${pageWidth * scale + bezel * 2}px`;
+    frame.style.height = `${frameHeight}px`;
+    iframe.style.width = `${pageWidth}px`;
+    iframe.style.height = `${(frameHeight - bar - bezel * 2) / scale}px`;
     iframe.style.transform = `scale(${scale})`;
+    iframe.style.top = `${bar + bezel}px`;
+    iframe.style.left = `${bezel}px`;
   }
   function setDevice(device) {
     stage.classList.toggle('is-mobile', device === 'mobile');
     dialog.querySelectorAll('[data-device]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.device === device)));
+    frame.classList.remove('is-switching');
+    void frame.offsetWidth;
+    frame.classList.add('is-switching');
     sizePreview();
   }
+  iframe.addEventListener('animationend', () => frame.classList.remove('is-switching'));
+  iframe.addEventListener('load', () => { if (iframe.getAttribute('src')) frame.classList.remove('is-loading'); });
   document.querySelectorAll('[data-project]').forEach(button => button.addEventListener('click', () => {
     const project = projects[button.dataset.project];
     document.querySelector('#project-dialog-title').textContent = project.title;
+    dialogIndex.textContent = project.index;
+    frameUrl.textContent = project.src;
+    openLink.href = project.src;
+    openLink.setAttribute('aria-label', `פתיחת הקונספט ${project.title} בחלון חדש`);
+    frame.classList.add('is-loading');
     iframe.src = project.src;
     iframe.title = `תצוגת קונספט: ${project.title}`;
     setDevice(window.innerWidth < 650 ? 'mobile' : 'desktop');
@@ -226,9 +252,21 @@
     sizePreview();
     dialog.querySelector('.dialog-close').focus();
   }));
-  dialog.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', event => { if (event.target === dialog) { const r = dialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) dialog.close(); } });
-  dialog.addEventListener('close', () => iframe.removeAttribute('src'));
+  // Closing plays an exit animation first (frame sinks, window folds away, backdrop clears).
+  let closeTimer = 0;
+  function closeDialog() {
+    if (!dialog.open || dialog.classList.contains('is-closing')) return;
+    if (motionReduced()) { dialog.close(); return; }
+    dialog.classList.add('is-closing');
+    const finish = () => { clearTimeout(closeTimer); dialog.removeEventListener('animationend', onEnd); dialog.close(); };
+    const onEnd = event => { if (event.target === dialog && event.animationName === 'dialog-out' && !event.pseudoElement) finish(); };
+    dialog.addEventListener('animationend', onEnd);
+    closeTimer = setTimeout(finish, 550);
+  }
+  dialog.querySelector('.dialog-close').addEventListener('click', closeDialog);
+  dialog.addEventListener('cancel', event => { event.preventDefault(); closeDialog(); });
+  dialog.addEventListener('click', event => { if (event.target === dialog) { const r = dialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) closeDialog(); } });
+  dialog.addEventListener('close', () => { dialog.classList.remove('is-closing'); iframe.removeAttribute('src'); });
   dialog.querySelectorAll('[data-device]').forEach(button => button.addEventListener('click', () => setDevice(button.dataset.device)));
   if ('ResizeObserver' in window) new ResizeObserver(sizePreview).observe(stage);
   else addEventListener('resize', sizePreview, { passive: true });
@@ -247,7 +285,28 @@
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('היי Valoria, נשמח לדבר על אתר חדש לעסק שלנו.')}`, '_blank', 'noopener,noreferrer');
   }));
   const form = document.querySelector('.contact-form');
-  if (hasDestination) document.querySelector('#contact-note').textContent = whatsappReady ? 'הכפתור יפתח הודעה מוכנה ב־WhatsApp. השליחה תתבצע רק באישורכם שם.' : 'הכפתור יפתח טיוטה בתוכנת המייל שלכם. השליחה תתבצע משם.';
+  // Phone: only digits, a leading +, and the usual separators (space, dash, parentheses).
+  // Typed characters are blocked up front; pasted/dropped/autofilled text is cleaned in place.
+  const phone = form.querySelector('#phone');
+  const cleanPhone = value => {
+    const kept = value.replace(/[^\d+\-\s()]/g, '');
+    const plus = /^\s*\+/.test(kept);
+    return (plus ? '+' : '') + kept.replace(/\+/g, '').replace(/^\s+/, '');
+  };
+  phone.addEventListener('beforeinput', event => {
+    if (!event.data || !event.inputType.startsWith('insert') || event.inputType === 'insertFromPaste' || event.inputType === 'insertFromDrop') return;
+    const start = phone.selectionStart ?? phone.value.length;
+    const end = phone.selectionEnd ?? start;
+    const next = phone.value.slice(0, start) + event.data + phone.value.slice(end);
+    if (cleanPhone(next) !== next) event.preventDefault();
+  });
+  phone.addEventListener('input', () => {
+    const clean = cleanPhone(phone.value);
+    if (clean === phone.value) return;
+    const caret = cleanPhone(phone.value.slice(0, phone.selectionStart ?? phone.value.length)).length;
+    phone.value = clean;
+    phone.setSelectionRange(caret, caret);
+  });  if (hasDestination) document.querySelector('#contact-note').textContent = whatsappReady ? 'הכפתור יפתח הודעה מוכנה ב־WhatsApp. השליחה תתבצע רק באישורכם שם.' : 'הכפתור יפתח טיוטה בתוכנת המייל שלכם. השליחה תתבצע משם.';
   form.addEventListener('submit', event => {
     event.preventDefault();
     if (!form.reportValidity()) return;
