@@ -419,6 +419,23 @@
     });
   });
 
+  /* ---------- Touch screens: "next chapter" titles fill in when scrolled into view (no hover there) ---------- */
+  const touchOnly = matchMedia('(hover: none)');
+  if ('IntersectionObserver' in window) {
+    const chapterObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.45) entry.target.classList.add('is-inview');
+        else if (!entry.isIntersecting) entry.target.classList.remove('is-inview');
+      });
+    }, { threshold: [0, 0.45] });
+    const watchChapters = () => document.querySelectorAll('.next-chapter').forEach(el => {
+      if (touchOnly.matches) chapterObserver.observe(el);
+      else { chapterObserver.unobserve(el); el.classList.remove('is-inview'); }
+    });
+    watchChapters();
+    touchOnly.addEventListener('change', watchChapters);
+  }
+
   /* ---------- Contact form: smooth caret (VS Code style) + floating ghost of each typed letter ---------- */
   const typingFields = [...document.querySelectorAll('.contact-form .field > input, .contact-form .field > textarea')];
   const mirror = document.createElement('div');
@@ -491,14 +508,21 @@
 
     field.addEventListener('focus', () => { if (!caretsOn) return; caret.classList.add('is-on'); place(true); });
     field.addEventListener('blur', () => caret.classList.remove('is-on'));
+    let prevLength = field.value.length;
     field.addEventListener('input', event => {
+      const grewByOne = field.value.length === prevLength + 1;
+      prevLength = field.value.length;
       if (!caretsOn) return;
       const before = last;
       place(false);
       typing();
-      if (event.inputType === 'insertText' && before && last) {
+      // desktop keyboards send single letters; phone keyboards (autocomplete) send the whole word
+      // being composed, so there the ghost is the newest letter whenever exactly one was added
+      const letter = event.inputType === 'insertText' ? event.data
+        : event.inputType === 'insertCompositionText' && grewByOne && event.data ? event.data.slice(-1) : null;
+      if (letter && before && last) {
         const sameLine = Math.abs(before.y - last.y) < 2;
-        ghost(event.data, { x: sameLine ? (before.x + last.x) / 2 : last.x, y: last.y, h: last.h });
+        ghost(letter, { x: sameLine ? (before.x + last.x) / 2 : last.x, y: last.y, h: last.h });
       }
     });
     field.addEventListener('scroll', () => place(true), { passive: true });
@@ -513,7 +537,7 @@
   addEventListener('resize', () => { const place = placers.get(document.activeElement); if (place) place(true); }, { passive: true });
 
   function setCaretsEnabled() {
-    caretsOn = finePointer.matches && !reduced();
+    caretsOn = !reduced(); // phones included: the smooth caret and letter ghosts work with touch keyboards too
     if (caretsOn && !mirror.isConnected) document.body.appendChild(mirror);
     root.classList.toggle('has-v-caret', caretsOn);
     if (!caretsOn) document.querySelectorAll('.v-caret').forEach(c => c.classList.remove('is-on'));

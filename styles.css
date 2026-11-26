@@ -601,3 +601,34 @@ html::-webkit-scrollbar{display:none}
   .dialog-toolbar h2{font-size:17px}
   .preview-switch{width:100%}
 }
+
+/* ==========================================================================
+   Phones & touch screens only — desktop is untouched
+   ========================================================================== */
+/* No hover on touch: the "next chapter" title fills in when it scrolls into view (class from fx.js) */
+@media (hover:none){
+  .next-title{transition:background-size 1.3s var(--ease-out) .15s}
+  .next-title::before{transition:opacity 1s var(--ease-out) .25s}
+  .next-chapter.is-inview .next-title{background-size:100% 100%}
+  .next-chapter.is-inview .next-title::before{opacity:0}
+  .next-chapter.is-inview .next-arrow{background:#f1f1ed;color:#111;border-color:#f1f1ed;transition-delay:.35s}
+  .next-chapter:active .next-arrow{transform:translateX(-10px) scale(.94);transition-duration:.2s}
+  .next-chapter:active .next-title{opacity:.85}
+  html.reduce-motion .next-title{background-size:100% 100%;transition:none}
+  html.reduce-motion .next-title::before{opacity:0}
+}
+@media (max-width:650px){
+  /* the scroll progress bar lives at the bottom edge on phones, so it no longer reads as a browser loading bar */
+  .scroll-progress{top:auto;bottom:0;height:3px;box-shadow:0 0 10px #ffffff40}
+  /* hero labels sit at the edges of the art so the big chrome model never hides them */
+  .art-label-top{top:3%;left:5%}
+  .art-label-bottom{bottom:3%;right:5%}
+  /* UX card: a slightly smaller "אבגד" leaves room for the switch beside it */
+  .ui-type{font-size:44px;letter-spacing:-3px}
+  .ui-toggle{bottom:18px;right:0;width:58px;height:30px}
+  .ui-toggle i{width:22px;height:22px}
+  .service-wide:hover .ui-toggle i{transform:translateX(28px)}
+  .service-wide:hover .ui-colors i:nth-child(2){transform:translateX(8px)}
+  .service-wide:hover .ui-colors i:nth-child(3){transform:translateX(16px)}
+  .service-wide:hover .ui-colors i:nth-child(4){transform:translateX(24px)}
+}
