@@ -11,6 +11,7 @@
     root.classList.toggle('reduce-motion', motionReduced());
     motionButton.setAttribute('aria-pressed', String(motionReduced()));
     motionButton.textContent = motionReduced() ? 'תנועה מופחתת פעילה' : 'הפחתת תנועה';
+    document.dispatchEvent(new CustomEvent('valoria:motion', { detail: { reduced: motionReduced() } }));
   }
   applyMotionPreference();
   reducedQuery.addEventListener('change', applyMotionPreference);
@@ -20,16 +21,17 @@
     applyMotionPreference();
   });
 
+  let revealObserver = null;
   if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => {
+    revealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
+          revealObserver.unobserve(entry.target);
         }
       });
     }, { threshold: 0.08, rootMargin: '0px 0px -25px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     root.classList.add('js-ready');
   }
 
@@ -72,11 +74,7 @@
     inertTargets.forEach(el => { el.inert = true; });
     mobileNav.querySelector('a').focus();
   });
-  mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-    closeMenu();
-    const destination = document.querySelector(link.getAttribute('href'));
-    if (destination) { destination.setAttribute('tabindex', '-1'); destination.focus({ preventScroll: true }); }
-  }));
+  mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => closeMenu()));
   header.querySelectorAll('a').forEach(link => link.addEventListener('click', () => closeMenu()));
   document.addEventListener('keydown', event => {
     if (mobileNav.hidden) return;
@@ -89,19 +87,111 @@
     }
   });
   matchMedia('(min-width: 651px)').addEventListener('change', event => { if (event.matches) closeMenu(); });
-  if ('IntersectionObserver' in window) {
-    const navObserver = new IntersectionObserver(entries => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        document.querySelectorAll('.desktop-nav a').forEach(link => {
-          const active = link.hash === `#${entry.target.id}`;
-          link.classList.toggle('active', active);
-          if (active) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current');
-        });
-      }
-    }, { rootMargin: '-20% 0px -55% 0px' });
-    document.querySelectorAll('main section[id]').forEach(section => navObserver.observe(section));
+  // Internal tabs: every in-page link (#work, #contact, ...) shows only its panel instead of scrolling.
+  const panels = [...document.querySelectorAll('main [data-tab]')];
+  const tabNames = new Set(panels.map(panel => panel.dataset.tab));
+  const navLinks = [...document.querySelectorAll('.brand, .desktop-nav a, .mobile-nav a, .nav-contact')];
+  const tabFromHash = hash => {
+    const name = decodeURIComponent(String(hash || '').replace(/^#/, ''));
+    return tabNames.has(name) ? name : 'home';
+  };
+
+  // A pill that glides under the active (or hovered) item of the desktop menu.
+  const desktopNav = document.querySelector('.desktop-nav');
+  const indicator = document.createElement('span');
+  indicator.className = 'nav-indicator';
+  indicator.setAttribute('aria-hidden', 'true');
+  desktopNav.prepend(indicator);
+  let indicatorPlaced = false;
+  function moveIndicator(link) {
+    if (!link || !link.getClientRects().length) { indicator.style.opacity = '0'; return; }
+    const navBox = desktopNav.getBoundingClientRect();
+    const box = link.getBoundingClientRect();
+    if (!indicatorPlaced) indicator.style.transition = 'none';
+    indicator.style.width = `${box.width}px`;
+    indicator.style.transform = `translateX(${box.left - navBox.left}px)`;
+    indicator.style.opacity = '1';
+    if (!indicatorPlaced) { void indicator.offsetWidth; indicator.style.transition = ''; indicatorPlaced = true; }
   }
+  const activeNavLink = () => desktopNav.querySelector('a.active');
+  desktopNav.addEventListener('pointerover', event => { const link = event.target.closest('a'); if (link) moveIndicator(link); });
+  desktopNav.addEventListener('pointerleave', () => moveIndicator(activeNavLink()));
+  addEventListener('resize', () => moveIndicator(activeNavLink()), { passive: true });
+  if (document.fonts) document.fonts.ready.then(() => moveIndicator(activeNavLink()));
+
+  // Each chapter gets its own document title and a level-one heading for assistive tech.
+  const homeTitle = document.title;
+  const tabTitle = document.querySelector('.tab-title');
+  const tabLabels = {};
+  document.querySelectorAll('.desktop-nav a, .mobile-nav a').forEach(link => {
+    const name = link.hash.slice(1);
+    const label = [...link.childNodes].filter(node => !(node.nodeType === 1 && node.getAttribute('aria-hidden') === 'true')).map(node => node.textContent).join('').trim();
+    if (name && label && !tabLabels[name]) tabLabels[name] = label;
+  });
+
+  let currentTab = null;
+  function focusTab(name) {
+    const start = panels.find(panel => panel.dataset.tab === name && panel.hasAttribute('data-tab-start'));
+    const heading = start && start.querySelector('h1, h2');
+    if (heading) { heading.setAttribute('tabindex', '-1'); heading.focus({ preventScroll: true }); }
+  }
+  function applyTab(name, focus) {
+    panels.forEach(panel => {
+      const active = panel.dataset.tab === name;
+      panel.hidden = !active;
+      panel.classList.remove('tab-enter');
+      // Replay the entrance animations every time a chapter is opened.
+      if (active && revealObserver) panel.querySelectorAll('.reveal').forEach(el => { el.classList.remove('is-visible'); revealObserver.observe(el); });
+    });
+    navLinks.forEach(link => {
+      const active = link.hash === `#${name}`;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+    });
+    root.dataset.tab = name;
+    currentTab = name;
+    const label = tabLabels[name];
+    document.title = name === 'home' || !label ? homeTitle : `${label} | Valoria`;
+    if (tabTitle) { tabTitle.textContent = label ? `${label} — Valoria` : ''; tabTitle.hidden = name === 'home' || !label; }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    moveIndicator(activeNavLink());
+    if (focus) focusTab(name);
+    document.dispatchEvent(new CustomEvent('valoria:tab', { detail: { name } }));
+  }
+  function showTab(name, { focus = false } = {}) {
+    if (name === currentTab) {
+      window.scrollTo({ top: 0, behavior: motionReduced() ? 'instant' : 'smooth' });
+      if (focus) focusTab(name);
+      return;
+    }
+    const firstRender = currentTab === null;
+    if (!firstRender && !motionReduced() && typeof document.startViewTransition === 'function') {
+      // Cross-page style transition between chapters (Chrome, Edge, Safari 18+).
+      const transition = document.startViewTransition(() => applyTab(name, focus));
+      transition.ready.catch(() => {}); // a quick second click skips the first transition; that is fine
+      transition.finished.finally(scheduleScroll);
+      return;
+    }
+    applyTab(name, focus);
+    if (!firstRender && !motionReduced()) {
+      panels.forEach(panel => { if (panel.dataset.tab === name) { void panel.offsetWidth; panel.classList.add('tab-enter'); } });
+    }
+    scheduleScroll();
+  }
+  document.addEventListener('click', event => {
+    const link = event.target.closest('a[href^="#"]');
+    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (link.hasAttribute('data-scroll-top')) { event.preventDefault(); window.scrollTo({ top: 0, behavior: motionReduced() ? 'instant' : 'smooth' }); return; }
+    const name = link.hash.slice(1);
+    if (!tabNames.has(name)) return; // e.g. the skip link (#main) keeps its default behaviour
+    event.preventDefault();
+    if (location.hash !== `#${name}`) history.pushState(null, '', `#${name}`);
+    showTab(name, { focus: true });
+  });
+  addEventListener('popstate', () => showTab(tabFromHash(location.hash)));
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  root.classList.add('tabs-ready');
+  showTab(tabFromHash(location.hash));
 
   const dialog = document.querySelector('.project-dialog');
   const iframe = dialog.querySelector('iframe');

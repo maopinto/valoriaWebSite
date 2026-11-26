@@ -6,6 +6,6 @@
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
-    "check": "node --check app.js && node --check site-config.js"
+    "check": "node --check app.js && node --check fx.js && node --check chrome.js && node --check site-config.js"
   }
 }
