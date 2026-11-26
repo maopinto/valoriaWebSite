@@ -110,9 +110,21 @@
     architecture: { title: 'מרחב — אדריכלות עם מחשבה', src: 'concepts/architecture.html' },
     objects: { title: 'אובייקט — פחות, אבל מדויק', src: 'concepts/objects.html' }
   };
+  function sizePreview() {
+    if (!dialog.open) return;
+    const spacing = getComputedStyle(stage);
+    const availableWidth = stage.clientWidth - parseFloat(spacing.paddingLeft) - parseFloat(spacing.paddingRight);
+    const availableHeight = stage.clientHeight - parseFloat(spacing.paddingTop) - parseFloat(spacing.paddingBottom);
+    const width = stage.classList.contains('is-mobile') ? Math.min(375, availableWidth) : Math.max(1024, availableWidth);
+    const scale = Math.min(1, availableWidth / width);
+    iframe.style.width = `${width}px`;
+    iframe.style.height = `${availableHeight / scale}px`;
+    iframe.style.transform = `scale(${scale})`;
+  }
   function setDevice(device) {
     stage.classList.toggle('is-mobile', device === 'mobile');
     dialog.querySelectorAll('[data-device]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.device === device)));
+    sizePreview();
   }
   document.querySelectorAll('[data-project]').forEach(button => button.addEventListener('click', () => {
     const project = projects[button.dataset.project];
@@ -121,12 +133,15 @@
     iframe.title = `תצוגת קונספט: ${project.title}`;
     setDevice(window.innerWidth < 650 ? 'mobile' : 'desktop');
     dialog.showModal();
+    sizePreview();
     dialog.querySelector('.dialog-close').focus();
   }));
   dialog.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', event => { if (event.target === dialog) { const r = dialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) dialog.close(); } });
   dialog.addEventListener('close', () => iframe.removeAttribute('src'));
   dialog.querySelectorAll('[data-device]').forEach(button => button.addEventListener('click', () => setDevice(button.dataset.device)));
+  if ('ResizeObserver' in window) new ResizeObserver(sizePreview).observe(stage);
+  else addEventListener('resize', sizePreview, { passive: true });
 
   const toast = document.querySelector('.toast');
   let toastTimer;
