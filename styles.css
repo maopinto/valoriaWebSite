@@ -726,3 +726,9 @@ h2 .key{background:var(--accent-text);-webkit-background-clip:text;background-cl
 /* Process: the big asterisk and the active step dot take the chapter metal */
 .process-decoration{background:var(--accent-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
 .process-step.is-active .step-dot{background:var(--accent);border-color:var(--accent-light);box-shadow:0 0 0 7px #090909,0 0 22px 6px var(--accent-glow)}
+
+/* Header on phones: the contact pill never wraps; the wide logo gives way first */
+.nav-contact{white-space:nowrap;flex-shrink:0}
+@media(max-width:650px){.brand{min-width:0;flex-shrink:1}.brand img{max-width:100%}}
+@media(max-width:400px){.brand img{width:104px}.nav-contact{gap:10px;padding-inline:12px}}
+@media(max-width:340px){.brand img{width:92px}}
