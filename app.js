@@ -3,23 +3,14 @@
   const root = document.documentElement;
   const config = window.VALORIA_CONFIG || {};
   const reducedQuery = matchMedia('(prefers-reduced-motion: reduce)');
-  let manualReduction = false;
-  try { manualReduction = localStorage.getItem('valoria-reduce-motion') === 'true'; } catch {}
-  const motionButton = document.querySelector('.motion-toggle');
-  const motionReduced = () => manualReduction || reducedQuery.matches;
+  try { localStorage.removeItem('valoria-reduce-motion'); } catch {}
+  const motionReduced = () => reducedQuery.matches;
   function applyMotionPreference() {
     root.classList.toggle('reduce-motion', motionReduced());
-    motionButton.setAttribute('aria-pressed', String(motionReduced()));
-    motionButton.textContent = motionReduced() ? 'תנועה מופחתת פעילה' : 'הפחתת תנועה';
     document.dispatchEvent(new CustomEvent('valoria:motion', { detail: { reduced: motionReduced() } }));
   }
   applyMotionPreference();
   reducedQuery.addEventListener('change', applyMotionPreference);
-  motionButton.addEventListener('click', () => {
-    manualReduction = !manualReduction;
-    try { localStorage.setItem('valoria-reduce-motion', String(manualReduction)); } catch {}
-    applyMotionPreference();
-  });
 
   let revealObserver = null;
   if ('IntersectionObserver' in window) {

@@ -15,7 +15,7 @@
     <link rel="preload" href="assets/fonts/heebo-regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="assets/fonts/heebo-black.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="assets/fonts/frank-ruhl-libre-hebrew.woff2" as="font" type="font/woff2" crossorigin>
-    <script>(function () { var d = document.documentElement; d.classList.add('js'); try { var r = matchMedia('(prefers-reduced-motion: reduce)').matches || localStorage.getItem('valoria-reduce-motion') === 'true'; if (!r && !sessionStorage.getItem('valoria-intro')) d.classList.add('intro-pending'); } catch (e) { } })();</script>
+    <script>(function () { var d = document.documentElement; d.classList.add('js'); try { var r = matchMedia('(prefers-reduced-motion: reduce)').matches; if (!r && !sessionStorage.getItem('valoria-intro')) d.classList.add('intro-pending'); } catch (e) { } })();</script>
     <link rel="stylesheet" href="styles.css">
     <script src="site-config.js" defer></script>
     <script src="app.js" defer></script>
@@ -32,8 +32,8 @@
     </svg>
     <a class="skip-link" href="#main">דילוג לתוכן הראשי</a>
     <div class="intro" aria-hidden="true">
-        <div class="intro-inner"><img class="intro-logo" src="images/logos/valoria-logo-light.webp" alt="" width="1435"
-                height="838">
+        <div class="intro-inner"><img class="intro-logo" src="images/logos/valoria-logo-light.webp" alt="" width="1271"
+                height="324">
             <div class="intro-meter"><span></span></div>
             <div class="intro-meta" dir="ltr"><span>VALORIA STUDIO</span><span class="intro-count">00</span></div>
         </div>
@@ -47,7 +47,7 @@
     <header class="site-header">
         <span class="bsd">בס״ד</span>
         <a class="brand" href="#home" aria-label="Valoria — עמוד הבית"><img src="images/logos/valoria-logo-light.webp"
-                alt="Valoria" width="1435" height="838" fetchpriority="high"></a>
+                alt="Valoria" width="1271" height="324" fetchpriority="high"></a>
         <nav class="desktop-nav" aria-label="ניווט ראשי"><a href="#work">העבודות</a><a href="#services">מה אנחנו
                 עושים</a><a href="#about">הסטודיו</a><a href="#process">התהליך</a><a href="#faq">שאלות נפוצות</a></nav>
         <a class="nav-contact" href="#contact">בואו נדבר <span aria-hidden="true">✦</span></a>
@@ -87,28 +87,28 @@
                         <defs>
                             <linearGradient id="chrome" x1="130" y1="100" x2="480" y2="520"
                                 gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#252525" />
-                                <stop offset=".13" stop-color="#f3f3f3" />
-                                <stop offset=".25" stop-color="#777" />
-                                <stop offset=".34" stop-color="#171717" />
-                                <stop offset=".44" stop-color="#d7d7d7" />
-                                <stop offset=".51" stop-color="#fff" />
-                                <stop offset=".61" stop-color="#525252" />
-                                <stop offset=".72" stop-color="#141414" />
-                                <stop offset=".85" stop-color="#aaa" />
-                                <stop offset="1" stop-color="#f0f0f0" />
+                                <stop stop-color="#2a2210" />
+                                <stop offset=".13" stop-color="#fff1bf" />
+                                <stop offset=".25" stop-color="#a8832f" />
+                                <stop offset=".34" stop-color="#1c160a" />
+                                <stop offset=".44" stop-color="#ebc666" />
+                                <stop offset=".51" stop-color="#fff8e0" />
+                                <stop offset=".61" stop-color="#7a5e22" />
+                                <stop offset=".72" stop-color="#17120a" />
+                                <stop offset=".85" stop-color="#d4ae52" />
+                                <stop offset="1" stop-color="#f6dc8e" />
                             </linearGradient>
                             <linearGradient id="rim" x1="150" y1="130" x2="450" y2="500">
-                                <stop stop-color="#fff" />
-                                <stop offset=".5" stop-color="#666" />
-                                <stop offset="1" stop-color="#fff" />
+                                <stop stop-color="#fff8e0" />
+                                <stop offset=".5" stop-color="#9c7a30" />
+                                <stop offset="1" stop-color="#fff8e0" />
                             </linearGradient>
                             <radialGradient id="metal">
-                                <stop stop-color="#eee" />
-                                <stop offset=".38" stop-color="#777" />
-                                <stop offset=".65" stop-color="#191919" />
-                                <stop offset=".83" stop-color="#bbb" />
-                                <stop offset="1" stop-color="#333" />
+                                <stop stop-color="#fff1bf" />
+                                <stop offset=".38" stop-color="#a8832f" />
+                                <stop offset=".65" stop-color="#1c160a" />
+                                <stop offset=".83" stop-color="#e2b955" />
+                                <stop offset="1" stop-color="#4a3a16" />
                             </radialGradient>
                             <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feGaussianBlur stdDeviation="16" />
@@ -160,17 +160,15 @@
                         פשרות</span><i>✦</i><span>הפרטים הקטנים</span><i>✦</i><span>האימפקט הגדול</span><i>✦</i></div>
             </div>
             <div class="tape tape-front" aria-hidden="true">
-                <div class="tape-track">
-                    <span>אסטרטגיה</span><i>✦</i><span>עיצוב</span><i>✦</i><span>פיתוח</span><i>✦</i><span
-                        class="strip-outline">חוויה</span><i>✦</i><span>אסטרטגיה</span><i>✦</i><span>עיצוב</span><i>✦</i><span>פיתוח</span><i>✦</i><span
-                        class="strip-outline">חוויה</span><i>✦</i></div>
+                <div class="tape-track"><span>אסטרטגיה</span><i>✦</i><span class="strip-outline">עיצוב</span><i>✦</i><span>פיתוח</span><i>✦</i><span class="strip-outline">חוויה</span><i>✦</i><span>אסטרטגיה</span><i>✦</i><span class="strip-outline">עיצוב</span><i>✦</i><span>פיתוח</span><i>✦</i><span class="strip-outline">חוויה</span><i>✦</i>
+                </div>
             </div>
         </div>
         <section class="home-index section-shell section-space" data-tab="home" aria-labelledby="index-title">
             <div class="section-heading reveal">
                 <div>
                     <p class="eyebrow"><span class="tiny-star">✦</span> מפת הדרך</p>
-                    <h2 id="index-title">מאיפה<br><span class="muted serif-accent">מתחילים?</span></h2>
+                    <h2 id="index-title">מאיפה<br>מתחילים?</h2>
                 </div>
                 <p class="section-intro">שישה פרקים קצרים על מי שאנחנו,<br>מה אנחנו עושים ואיך נעבוד יחד.</p>
             </div>
@@ -223,8 +221,8 @@
             aria-labelledby="work-title">
             <div class="section-heading reveal">
                 <div>
-                    <p class="eyebrow"><span class="tiny-star">✦</span> מתוך המעבדה שלנו</p>
-                    <h2 id="work-title">רעיונות שקיבלו<span class="muted"> צורה.</span></h2>
+                    <p class="eyebrow"><span class="tiny-star">✦</span> מתוך הסטודיו שלנו</p>
+                    <h2 id="work-title">רעיונות שקיבלו <span class="key">צורה.</span></h2>
                 </div>
                 <p class="section-intro">קצת מהדרך שבה אנחנו חושבים,<br>מעצבים והופכים רעיון לחוויה.</p>
             </div>
@@ -265,8 +263,8 @@
                                     מדויק</i></div>
                             <div class="objects-screen">
                                 <div class="mini-nav"><b>אובייקט</b><span>צורה. חומר. מחשבה.</span></div>
-                                <div class="object-title">פחות.<br><em>אבל מדויק.</em></div><img src="assets/chair.svg"
-                                    alt="" loading="lazy" width="600" height="620">
+                                <div class="object-title">פחות.<br>אבל מדויק.</div><img src="assets/chair.svg" alt=""
+                                    loading="lazy" width="600" height="620">
                                 <div class="object-caption">מקום לדברים שנשארים.</div>
                             </div>
                         </div>
@@ -299,7 +297,7 @@
             <div class="section-heading reveal">
                 <div>
                     <p class="eyebrow"><span class="tiny-star">✦</span> כל מה שהנוכחות שלכם צריכה</p>
-                    <h2 id="services-title">מהרעיון הראשון.<br><span class="muted">עד הפיקסל האחרון.</span></h2>
+                    <h2 id="services-title">מהרעיון הראשון.<br><span class="key">עד הפיקסל האחרון.</span></h2>
                 </div>
                 <p class="section-intro">עיצוב וטכנולוגיה, באותו ראש.<br>כדי שכל חלק באתר יעבוד בשבילכם.</p>
             </div>
@@ -361,15 +359,15 @@
             <div class="about-inner section-shell">
                 <div class="about-logo-wrap reveal"><span class="about-topline">האנשים שמאחורי הפיקסלים</span>
                     <div class="about-logo-stage"><span class="about-orbit" aria-hidden="true"></span><img
-                            src="images/logos/valoria-logo-dark.webp" alt="הלוגו של Valoria" width="1158" height="691"
+                            src="images/logos/valoria-logo-dark.webp" alt="הלוגו של Valoria" width="1270" height="325"
                             loading="lazy"></div>
                     <div class="about-logo-bottom"><span>יצירתיות. דיוק. אכפתיות.</span><span
                             aria-hidden="true">✦</span></div>
                 </div>
                 <div class="about-copy reveal">
                     <p class="eyebrow"><span class="tiny-star">✦</span> נעים להכיר, אנחנו Valoria</p>
-                    <h2 id="about-title">סטודיו צעיר.<br>מחשבה גדולה.<br><span class="about-outline serif-accent">יחס
-                            אישי.</span></h2>
+                    <h2 id="about-title">סטודיו <span class="key">צעיר.</span><br>מחשבה <span
+                            class="key">גדולה.</span><br>יחס <span class="key">אישי.</span></h2>
                     <p>הקמנו את Valoria מתוך אהבה לעיצוב ולטכנולוגיה, ומתוך אמונה שלכל עסק מגיע מקום דיגיטלי שמרגיש
                         בדיוק כמוהו.</p>
                     <p>אנחנו המייסדים, ואנחנו גם מי שיחשבו, יעצבו ויפתחו את האתר שלכם. מדברים ישירות, נכנסים לפרטים
@@ -382,8 +380,8 @@
             <div class="section-heading reveal">
                 <div>
                     <p class="eyebrow"><span class="tiny-star">✦</span> ההבדל נמצא בגישה</p>
-                    <h2 id="advantages-title">קטנים מספיק כדי להקשיב.<br><span class="muted">רעבים מספיק כדי
-                            להעז.</span></h2>
+                    <h2 id="advantages-title">קטנים מספיק כדי <span class="key">להקשיב.</span><br>רעבים מספיק כדי <span
+                            class="key">להעז.</span></h2>
                 </div>
             </div>
             <div class="advantages-grid">
@@ -415,7 +413,7 @@
             aria-labelledby="process-title">
             <div class="process-intro reveal">
                 <p class="eyebrow"><span class="tiny-star">✦</span> מה קורה מכאן?</p>
-                <h2 id="process-title">דרך ברורה.<br><span class="muted">תוצאה שלכם.</span></h2>
+                <h2 id="process-title">דרך <span class="key">ברורה.</span><br>תוצאה <span class="key">שלכם.</span></h2>
                 <p>בלי סימני שאלה מיותרים.<br>ארבעה שלבים, ושיחה פתוחה לאורך הדרך.</p>
                 <div class="process-decoration" aria-hidden="true">✳</div>
             </div>
@@ -465,7 +463,7 @@
             <div class="section-heading reveal">
                 <div>
                     <p class="eyebrow"><span class="tiny-star">✦</span> טוב ששאלתם</p>
-                    <h2 id="faq-title">לפני שמתחילים.</h2>
+                    <h2 id="faq-title">לפני <span class="key">שמתחילים.</span></h2>
                 </div>
                 <p class="section-intro">יש עוד משהו שמסקרן אתכם? <br><a href="#contact" class="inline-link">אנחנו כאן
                         לדבר.</a></p>
@@ -520,16 +518,10 @@
             aria-labelledby="contact-title">
             <div class="contact-copy reveal">
                 <p class="eyebrow"><span class="tiny-star">✦</span> כל דבר טוב מתחיל בשיחה</p>
-                <h2 id="contact-title">יש לכם חזון?<br><span class="silver-text serif-accent">בואו ניתן
-                        לו</span><br>כתובת<span class="contact-star" aria-hidden="true">✦</span></h2>
+                <h2 id="contact-title">יש לכם <span class="key">חזון?</span><br>בואו ניתן לו<br><span
+                        class="key">כתובת</span><span class="contact-star" aria-hidden="true">✦</span></h2>
                 <p>ספרו לנו קצת על העסק ועל מה שאתם מדמיינים.<br>את השאר, נחשוב יחד.</p><button class="whatsapp-text"
-                    data-whatsapp><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M20.5 11.7a8.5 8.5 0 0 1-12.6 7.5L3 20.5l1.3-4.8a8.5 8.5 0 1 1 16.2-4Z"
-                            stroke="currentColor" stroke-width="1.5" />
-                        <path
-                            d="M8.2 7.6c-.8.4-.8 1.7-.3 2.8 1 2.3 2.8 4 5.1 4.7 1.1.3 2.4 0 2.7-.8l.3-1-2.6-1.2-.9 1c-1.3-.5-2.5-1.6-3-2.7l.7-1-1.1-2.2Z"
-                            fill="currentColor" />
-                    </svg><span>מעדיפים WhatsApp?<strong dir="ltr" data-phone>050-000-0000</strong></span></button><span
+                    data-whatsapp><img src="images/mediaLogos/whatsAppLogo.png" alt="" aria-hidden="true" width="33" height="33" decoding="async"><span>מעדיפים WhatsApp?<strong dir="ltr" data-phone>050-000-0000</strong></span></button><span
                     class="placeholder-note">מספר זמני — יעודכן בקרוב</span>
             </div>
             <form class="contact-form reveal">
@@ -575,7 +567,7 @@
     <script>(function () { var h = decodeURIComponent((location.hash || '#home').slice(1)), p = document.querySelectorAll('main [data-tab]'), i, ok = false; for (i = 0; i < p.length; i++)if (p[i].getAttribute('data-tab') === h) ok = true; if (!ok) h = 'home'; for (i = 0; i < p.length; i++)if (p[i].getAttribute('data-tab') !== h) p[i].hidden = true; document.documentElement.setAttribute('data-tab', h); })();</script>
     <footer class="footer section-shell">
         <div class="footer-top"><a href="#home" aria-label="Valoria — חזרה לראש העמוד"><img
-                    src="images/logos/valoria-logo-light.webp" alt="Valoria" width="1435" height="838"
+                    src="images/logos/valoria-logo-light.webp" alt="Valoria" width="1271" height="324"
                     loading="lazy"></a>
             <p>יוצרים נוכחות.<br>משאירים רושם.</p>
             <nav aria-label="ניווט תחתון"><a href="#work">העבודות</a><a href="#services">מה אנחנו עושים</a><a
@@ -586,17 +578,10 @@
         <div class="footer-wordmark" aria-hidden="true" dir="ltr"><span class="wm-text">VALORIA</span><span
                 class="wm-star">✦</span></div>
         <div class="footer-bottom"><span>© <span id="year">2026</span> Valoria. כל הזכויות שמורות.</span><span>עוצב
-                ופותח עם מחשבה על כל פרט.</span><button class="motion-toggle" aria-pressed="false">הפחתת תנועה</button>
+                ופותח עם מחשבה על כל פרט.</span>
         </div>
     </footer>
-    <button class="floating-whatsapp" data-whatsapp aria-label="יצירת קשר ב־WhatsApp"><svg viewBox="0 0 24 24"
-            fill="none" aria-hidden="true">
-            <path d="M20.5 11.7a8.5 8.5 0 0 1-12.6 7.5L3 20.5l1.3-4.8a8.5 8.5 0 1 1 16.2-4Z" stroke="currentColor"
-                stroke-width="1.5" />
-            <path
-                d="M8.2 7.6c-.8.4-.8 1.7-.3 2.8 1 2.3 2.8 4 5.1 4.7 1.1.3 2.4 0 2.7-.8l.3-1-2.6-1.2-.9 1c-1.3-.5-2.5-1.6-3-2.7l.7-1-1.1-2.2Z"
-                fill="currentColor" />
-        </svg></button>
+    <button class="floating-whatsapp" data-whatsapp aria-label="יצירת קשר ב־WhatsApp"><img src="images/mediaLogos/whatsAppLogo.png" alt="" aria-hidden="true" width="27" height="27" decoding="async"></button>
     <div class="toast" role="status" aria-live="polite"></div>
     <dialog class="project-dialog" aria-labelledby="project-dialog-title">
         <div class="dialog-toolbar">

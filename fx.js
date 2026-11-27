@@ -309,10 +309,18 @@
     }, 250);
   }, { passive: true });
   let lastY = scrollY, lastT = performance.now(), boost = 0, boostRaf = 0;
+  // Hovering the band eases it down to a slow drift so the words can be read; leaving lets it pick up again.
+  let hoverRate = 1, hoverTarget = 1;
   function settleBoost() {
     boost *= 0.92;
-    tapeAnimations.forEach(animation => { animation.playbackRate = 1 + boost; });
-    boostRaf = boost > 0.02 ? requestAnimationFrame(settleBoost) : 0;
+    hoverRate += (hoverTarget - hoverRate) * 0.08;
+    tapeAnimations.forEach(animation => { animation.playbackRate = hoverRate + boost; });
+    boostRaf = boost > 0.02 || Math.abs(hoverTarget - hoverRate) > 0.01 ? requestAnimationFrame(settleBoost) : 0;
+  }
+  if (tapesBox) {
+    const setHover = target => () => { hoverTarget = target; if (!boostRaf && tapeAnimations.length && !reduced()) boostRaf = requestAnimationFrame(settleBoost); };
+    tapesBox.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') setHover(0.25)(); });
+    tapesBox.addEventListener('pointerleave', setHover(1));
   }
   addEventListener('scroll', () => {
     const now = performance.now();

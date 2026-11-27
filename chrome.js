@@ -124,8 +124,9 @@ void main(){
   vec3 col = env(r);
   col = mix(col * 0.86, col + 0.08, fres);
   col *= mix(0.45, 1.0, calcAO(p, n));
-  col *= mix(vec3(1.02, 1.0, 0.97), vec3(0.96, 0.985, 1.03), smoothstep(-0.4, 0.6, r.y));
-  col = 1.0 - exp(-col * 1.3);
+  // Gold metal: reflections are tinted warm (deeper in the shadows, paler near the sky lights)
+  col *= mix(vec3(1.0, 0.7, 0.26), vec3(1.0, 0.84, 0.5), smoothstep(-0.4, 0.6, r.y)) * 1.22;
+  col = 1.0 - exp(-col * 1.6);
   col += (hash(gl_FragCoord.xy) - 0.5) / 255.0;
   gl_FragColor = vec4(col * alpha, alpha);
 }`;
